@@ -1,0 +1,7 @@
+csv_path: './data/Rimini-2024-Gennaio.csv'
+model_path: './models/meteo.pth'
+state_dict_path: './models/meteo_state_dict.pth'
+scaler_path: './models/meteo_scaler.pkl'
+num_epochs: 100
+batch_size: 32
+learning_rate: 0.001

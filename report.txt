@@ -1,0 +1,10 @@
+Prima di iniziare a scrivere il codice ho ricercato se esistevano progetti o idee simili; successivamente ho cercato
+delle basi di dati da usare e ho deciso di utilizzare quelle fornite dal sito ilmeteo.it.
+
+Dopo ciò ho creato un notebook python e iniziato a scrivere il codice con l'aiuto del materiale fornito e di chatgpt;
+inizialmente ho creato un semplice modello che analizzasse il database, poi ho creato una funzione per salvare questo
+modello e infine una funzione che permettesse di usare il modello per predirre il fenomeno climatico in base a dei dati
+inseriti.
+
+Dopo aver allenato il modello e essermi assicurato che tutto funzionasse ho convertito il notebook in un progetto python
+modulare, questo ha creato dei nuovi problemi ma dopo essere stati risolti il programma poteva essere definito concluso.

@@ -15,6 +15,14 @@ def load_config(config_path='config.yaml'):
     return config
 
 
+def ask_to_skip(step_name):
+    while True:
+        response = input(f"Vuoi eseguire la parte '{step_name}'? (si/no): ").lower()
+        if response in ['si', 'no']:
+            return response == 'si'
+        print("Risposta non valida. Scrivi 'si' o 'no'.")
+
+
 def main():
     # Carica la configurazione
     config = load_config()
@@ -28,39 +36,43 @@ def main():
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
 
-    # Caricamento e preparazione dati
-    data, scaler = load_and_process_data(csv_path)
-    dataloader = create_dataloader(data, batch_size)
+    if ask_to_skip('caricamento e preparazione dei dati'):
+        print("Caricamento e preparazione dei dati...")
+        data, scaler = load_and_process_data(csv_path)
+        dataloader = create_dataloader(data, batch_size)
 
     if os.path.exists(model_path):
         model = torch.load(model_path, weights_only=False)
     else:
         model = MeteoModel()
 
-    # Addestramento e valutazione
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     if os.path.exists(state_dict_path):
         model.load_state_dict(torch.load(state_dict_path))
 
-    # Salva il modello e lo scaler
-    torch.save(model, model_path)
-    torch.save(model.state_dict(), state_dict_path)
-    joblib.dump(scaler, scaler_path)
+    if os.path.exists(scaler_path):
+        scaler = joblib.load(scaler_path)
 
-    print("Inizio dell'addestramento...")
-    train_model(model, dataloader, optimizer, criterion, num_epochs)
+    if ask_to_skip('salvataggio'):
+        torch.save(model, model_path)
+        torch.save(model.state_dict(), state_dict_path)
+        joblib.dump(scaler, scaler_path)
 
-    # Valutazione finale
-    print("Valutazione del modello...")
-    test_loss = evaluate_model(model, dataloader, criterion)
-    print(f'Test Loss: {test_loss}')
+    if ask_to_skip('addestramento'):
+        print("Inizio dell'addestramento...")
+        train_model(model, dataloader, optimizer, criterion, num_epochs)
 
-    # Previsione
-    fenomeno_predetto = prevedi_fenomeno(model, scaler)
-    if fenomeno_predetto:
-        print(f'Il fenomeno meteo previsto è: {fenomeno_predetto}')
+    if ask_to_skip('valutazione'):
+        print("Valutazione del modello...")
+        test_loss = evaluate_model(model, dataloader, criterion)
+        print(f'Test Loss: {test_loss}')
+
+    if ask_to_skip('predizione meteo'):
+        fenomeno_predetto = prevedi_fenomeno(model, scaler)
+        if fenomeno_predetto:
+            print(f'Il fenomeno meteo previsto è: {fenomeno_predetto}')
 
 
 if __name__ == "__main__":

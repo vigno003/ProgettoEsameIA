@@ -36,10 +36,8 @@ def main():
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
 
-    if ask_to_skip('caricamento e preparazione dei dati'):
-        print("Caricamento e preparazione dei dati...")
-        data, scaler = load_and_process_data(csv_path)
-        dataloader = create_dataloader(data, batch_size)
+    data, scaler = load_and_process_data(csv_path)
+    dataloader = create_dataloader(data, batch_size)
 
     if os.path.exists(model_path):
         model = torch.load(model_path, weights_only=False)

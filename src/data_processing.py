@@ -26,7 +26,7 @@ def load_and_process_data(csv_path):
     data.rename(columns={'nebbia': 'fenomeni_nebbia', 'pioggia': 'fenomeni_pioggia', 'sole': 'fenomeni_sole'},
                 inplace=True)
 
-    # Aggiungi colonne mancanti
+    # Conversione colonne booleane in numeriche
     data['fenomeni_nebbia'] = data.get('fenomeni_nebbia', 0).astype(int)
     data['fenomeni_pioggia'] = data.get('fenomeni_pioggia', 0).astype(int)
     data['fenomeni_sole'] = data['fenomeni_sole'].astype(int)

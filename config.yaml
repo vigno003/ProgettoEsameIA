@@ -1,4 +1,4 @@
-csv_path: './data/Rimini-2024-Gennaio.csv'
+csv_path: './data/data.csv'
 model_path: './models/meteo.pth'
 state_dict_path: './models/meteo_state_dict.pth'
 scaler_path: './models/meteo_scaler.pkl'

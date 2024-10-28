@@ -53,11 +53,6 @@ def main():
     if os.path.exists(scaler_path):
         scaler = joblib.load(scaler_path)
 
-    if ask_to_skip('salvataggio'):
-        torch.save(model, model_path)
-        torch.save(model.state_dict(), state_dict_path)
-        joblib.dump(scaler, scaler_path)
-
     if ask_to_skip('addestramento'):
         print("Inizio dell'addestramento...")
         train_model(model, dataloader, optimizer, criterion, num_epochs)
@@ -66,6 +61,11 @@ def main():
         print("Valutazione del modello...")
         test_loss = evaluate_model(model, dataloader, criterion)
         print(f'Test Loss: {test_loss}')
+
+    if ask_to_skip('salvataggio'):
+        torch.save(model, model_path)
+        torch.save(model.state_dict(), state_dict_path)
+        joblib.dump(scaler, scaler_path)
 
     if ask_to_skip('predizione meteo'):
         fenomeno_predetto = prevedi_fenomeno(model, scaler)

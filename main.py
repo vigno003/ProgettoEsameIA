@@ -36,8 +36,9 @@ def main():
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
 
-    data, scaler = load_and_process_data(csv_path)
-    dataloader = create_dataloader(data, batch_size)
+    train_data, eval_data, scaler = load_and_process_data(csv_path)
+    train_dataloader = create_dataloader(train_data, batch_size)
+    eval_dataloader = create_dataloader(eval_data, batch_size)
 
     if os.path.exists(model_path):
         model = torch.load(model_path, weights_only=False)
@@ -55,11 +56,11 @@ def main():
 
     if ask_to_skip('addestramento'):
         print("Inizio dell'addestramento...")
-        train_model(model, dataloader, optimizer, criterion, num_epochs)
+        train_model(model, train_dataloader, optimizer, criterion, num_epochs)
 
     if ask_to_skip('valutazione'):
         print("Valutazione del modello...")
-        test_loss = evaluate_model(model, dataloader, criterion)
+        test_loss = evaluate_model(model, eval_dataloader, criterion)
         print(f'Test Loss: {test_loss}')
 
     if ask_to_skip('salvataggio'):

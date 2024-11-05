@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset, DataLoader
 import torch
@@ -31,7 +32,9 @@ def load_and_process_data(csv_path):
     data['fenomeni_pioggia'] = data.get('fenomeni_pioggia', 0).astype(int)
     data['fenomeni_sole'] = data['fenomeni_sole'].astype(int)
 
-    return data, scaler
+    train_data, eval_data = train_test_split(data, test_size=0.2, random_state=42)
+
+    return train_data, eval_data, scaler
 
 
 class MeteoDataset(Dataset):

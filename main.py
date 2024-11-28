@@ -5,6 +5,7 @@ from src.model import MeteoModel
 from src.data_processing import load_and_process_data, create_dataloader
 from src.train_evaluate import train_model, evaluate_model
 from src.predict import prevedi_fenomeno
+from src.create_graphs import create_graphs
 import os
 
 
@@ -67,6 +68,9 @@ def main():
         torch.save(model, model_path)
         torch.save(model.state_dict(), state_dict_path)
         joblib.dump(scaler, scaler_path)
+
+    if ask_to_skip('creazione grafici'):
+        create_graphs()
 
     if ask_to_skip('predizione meteo'):
         fenomeno_predetto = prevedi_fenomeno(model, scaler)

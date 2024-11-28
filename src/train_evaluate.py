@@ -6,6 +6,8 @@ def train_model(model, dataloader, optimizer, criterion, num_epochs, log_dir='ru
     model.train()
     for epoch in range(num_epochs):
         epoch_loss = 0
+        correct_predictions = 0
+        total_predictions = 0
         for inputs, labels in dataloader:
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -14,8 +16,16 @@ def train_model(model, dataloader, optimizer, criterion, num_epochs, log_dir='ru
             optimizer.step()
             epoch_loss += loss.item()
 
+            _, predicted = torch.max(outputs, 1)
+            _, labels_max = torch.max(labels, 1)
+            correct_predictions += (predicted == labels_max).sum().item()
+            total_predictions += labels.size(0)
+
             avg_loss = epoch_loss / len(dataloader)
+            accuracy = correct_predictions / total_predictions * 100
+
             writer.add_scalar('Loss/train', avg_loss, epoch)
+            writer.add_scalar('Accuracy/train', accuracy, epoch)
         print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(dataloader)}')
 
     writer.close()

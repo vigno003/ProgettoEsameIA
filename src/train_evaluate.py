@@ -1,8 +1,8 @@
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-def train_model(model, dataloader, optimizer, criterion, num_epochs, log_dir='runs/meteo_model'):
-    writer = SummaryWriter(log_dir)
+def train_model(model, dataloader, optimizer, criterion, num_epochs, config):
+    writer = SummaryWriter(config['log_dir'])
     model.train()
     for epoch in range(num_epochs):
         epoch_loss = 0

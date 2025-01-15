@@ -9,6 +9,4 @@ test_size: 0.2
 shuffle: true
 dropout_rate: 0.2
 hidden_units: 128
-activation_function: 'relu'
-optimizer: 'adam'
-loss_function: 'mse'
+log_dir: 'runs/meteo_model'

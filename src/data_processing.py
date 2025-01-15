@@ -5,7 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 
 
-def load_and_process_data(csv_path):
+def load_and_process_data(csv_path, config):
     # Caricamento dati
     csv = pd.read_csv(csv_path, sep=';')
     csv['FENOMENI'] = csv['FENOMENI'].fillna('sole').str.strip()
@@ -32,7 +32,7 @@ def load_and_process_data(csv_path):
     data['fenomeni_pioggia'] = data.get('fenomeni_pioggia', 0).astype(int)
     data['fenomeni_sole'] = data['fenomeni_sole'].astype(int)
 
-    train_data, eval_data = train_test_split(data, test_size=0.2, random_state=42)
+    train_data, eval_data = train_test_split(data, test_size=config['test_size'], random_state=42)
 
     return train_data, eval_data, scaler
 

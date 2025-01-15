@@ -28,36 +28,28 @@ def main():
     # Carica la configurazione
     config = load_config()
 
-    # Percorsi ai file
-    csv_path = config['csv_path']
-    model_path = config['model_path']
-    state_dict_path = config['state_dict_path']
-    scaler_path = config['scaler_path']
-    num_epochs = config['num_epochs']
-    batch_size = config['batch_size']
-    learning_rate = config['learning_rate']
+    # Carica e processa i dati
+    train_data, eval_data, scaler = load_and_process_data(config['csv_path'], config)
+    train_dataloader = create_dataloader(train_data, config['batch_size'])
+    eval_dataloader = create_dataloader(eval_data, config['batch_size'])
 
-    train_data, eval_data, scaler = load_and_process_data(csv_path)
-    train_dataloader = create_dataloader(train_data, batch_size)
-    eval_dataloader = create_dataloader(eval_data, batch_size)
-
-    if os.path.exists(model_path):
-        model = torch.load(model_path, weights_only=False)
+    if os.path.exists(config['model_path']):
+        model = torch.load(config['model_path'], weights_only=False)
     else:
-        model = MeteoModel()
+        model = MeteoModel(config)
 
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
 
-    if os.path.exists(state_dict_path):
-        model.load_state_dict(torch.load(state_dict_path))
+    if os.path.exists(config['state_dict_path']):
+        model.load_state_dict(torch.load(config['state_dict_path']))
 
-    if os.path.exists(scaler_path):
-        scaler = joblib.load(scaler_path)
+    if os.path.exists(config['scaler_path']):
+        scaler = joblib.load(config['scaler_path'])
 
     if ask_to_skip('addestramento'):
         print("Inizio dell'addestramento...")
-        train_model(model, train_dataloader, optimizer, criterion, num_epochs)
+        train_model(model, train_dataloader, optimizer, criterion, config['num_epochs'], config)
 
     if ask_to_skip('valutazione'):
         print("Valutazione del modello...")
@@ -65,12 +57,12 @@ def main():
         print(f'Test Loss: {test_loss}')
 
     if ask_to_skip('salvataggio'):
-        torch.save(model, model_path)
-        torch.save(model.state_dict(), state_dict_path)
-        joblib.dump(scaler, scaler_path)
+        torch.save(model, config['model_path'])
+        torch.save(model.state_dict(), config['state_dict_path'])
+        joblib.dump(scaler, config['scaler_path'])
 
     if ask_to_skip('creazione grafici'):
-        create_graphs()
+        create_graphs(config)
 
     if ask_to_skip('predizione meteo'):
         fenomeno_predetto = prevedi_fenomeno(model, scaler)

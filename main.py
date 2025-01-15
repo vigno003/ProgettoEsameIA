@@ -3,7 +3,7 @@ import joblib
 import yaml  # Per leggere il file di configurazione
 from src.model import MeteoModel
 from src.data_processing import load_and_process_data, create_dataloader
-from src.train_evaluate import train_model, evaluate_model
+from src.train_evaluate import train_model, evaluate_model, test_model
 from src.predict import prevedi_fenomeno
 from src.create_graphs import create_graphs
 import os
@@ -29,9 +29,10 @@ def main():
     config = load_config()
 
     # Carica e processa i dati
-    train_data, eval_data, scaler = load_and_process_data(config['csv_path'], config)
+    train_data, eval_data, test_data, scaler = load_and_process_data(config['csv_path'], config)
     train_dataloader = create_dataloader(train_data, config['batch_size'])
     eval_dataloader = create_dataloader(eval_data, config['batch_size'])
+    test_dataloader = create_dataloader(test_data, config['batch_size'])
 
     if os.path.exists(config['model_path']):
         model = torch.load(config['model_path'], weights_only=False)
@@ -53,8 +54,13 @@ def main():
 
     if ask_to_skip('valutazione'):
         print("Valutazione del modello...")
-        test_loss = evaluate_model(model, eval_dataloader, criterion)
-        print(f'Test Loss: {test_loss}')
+        eval_loss, eval_accuracy = evaluate_model(model, eval_dataloader, criterion)
+        print(f'Evaluation Loss: {eval_loss}, Accuracy: {eval_accuracy}%')
+
+    if ask_to_skip('test'):
+        print("Test del modello...")
+        test_loss, test_accuracy = test_model(model, test_dataloader, criterion)
+        print(f'Test Loss: {test_loss}, Accuracy: {test_accuracy}%')
 
     if ask_to_skip('salvataggio'):
         torch.save(model, config['model_path'])

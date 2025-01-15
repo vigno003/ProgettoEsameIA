@@ -32,9 +32,11 @@ def load_and_process_data(csv_path, config):
     data['fenomeni_pioggia'] = data.get('fenomeni_pioggia', 0).astype(int)
     data['fenomeni_sole'] = data['fenomeni_sole'].astype(int)
 
-    train_data, eval_data = train_test_split(data, test_size=config['test_size'], random_state=42)
+    # Divisione del dataset in training (60%), testing (20%) e evaluation (20%)
+    train_data, temp_data = train_test_split(data, test_size=0.4, random_state=42)
+    eval_data, test_data = train_test_split(temp_data, test_size=0.5, random_state=42)
 
-    return train_data, eval_data, scaler
+    return train_data, eval_data, test_data, scaler
 
 
 class MeteoDataset(Dataset):

@@ -5,3 +5,10 @@ scaler_path: './models/meteo_scaler.pkl'
 num_epochs: 100
 batch_size: 32
 learning_rate: 0.001
+test_size: 0.2
+shuffle: true
+dropout_rate: 0.2
+hidden_units: 128
+activation_function: 'relu'
+optimizer: 'adam'
+loss_function: 'mse'

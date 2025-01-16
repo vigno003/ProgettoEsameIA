@@ -68,7 +68,7 @@ def main():
         joblib.dump(scaler, config['scaler_path'])
 
     if ask_to_skip('creazione grafici'):
-        create_graphs(config)
+        create_graphs(config['log_dir'])
 
     if ask_to_skip('predizione meteo'):
         fenomeno_predetto = prevedi_fenomeno(model, scaler)

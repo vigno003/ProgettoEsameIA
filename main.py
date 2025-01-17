@@ -43,7 +43,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
 
     if os.path.exists(config['state_dict_path']):
-        model.load_state_dict(torch.load(config['state_dict_path']))
+        model.load_state_dict(torch.load(config['state_dict_path'], weights_only=True))
 
     if os.path.exists(config['scaler_path']):
         scaler = joblib.load(config['scaler_path'])

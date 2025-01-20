@@ -12,7 +12,6 @@ def train_model(model, train_dataloader, optimizer, criterion, num_epochs, confi
         epoch_loss = 0
         correct_predictions = 0
         total_predictions = 0
-        print(f"Epoch {epoch+1}/{num_epochs} (ripartendo da batch {start_batch_idx})")
         for batch_idx, (inputs, labels) in enumerate(train_dataloader, start=start_batch_idx):
             optimizer.zero_grad()
             outputs = model(inputs)

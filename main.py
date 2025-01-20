@@ -26,7 +26,6 @@ def ask_to_skip(step_name):
             return response == 'si'
         print("Risposta non valida. Scrivi 'si' o 'no'.")
 
-
 def save_progress(model, scaler, optimizer, epoch, batch_idx, config):
     checkpoint = {
         'model_state_dict': model.state_dict(),
@@ -39,11 +38,9 @@ def save_progress(model, scaler, optimizer, epoch, batch_idx, config):
     shutil.copyfile(config['scaler_path'], './models/copy_scaler.pkl')
     print("Progressi salvati.")
 
-
 def signal_handler(sig, frame):
     save_progress(model, scaler, optimizer, epoch, batch_idx, config)
     sys.exit(0)
-
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -96,8 +93,12 @@ def main():
         scaler = joblib.load(config['scaler_path'])
 
     if ask_to_skip('addestramento'):
-        print(f"Inizio dell'addestramento da epoch {epoch}, batch {batch_idx}...")
-        train_model(model, train_dataloader, optimizer, criterion, config['num_epochs'], config, start_epoch=epoch, start_batch_idx=batch_idx)
+        print("Inizio dell'addestramento...")
+        for epoch in range(epoch, config['num_epochs']):
+            for batch_idx, (inputs, targets) in enumerate(train_dataloader, start=batch_idx):
+                train_model(model, train_dataloader, optimizer, criterion, config['num_epochs'], config)
+                pass
+            batch_idx = 0  # Reset batch_idx at the end of each epoch
 
     if ask_to_skip('valutazione'):
         print("Valutazione del modello...")

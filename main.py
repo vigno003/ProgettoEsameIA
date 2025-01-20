@@ -7,6 +7,9 @@ from src.train_evaluate import train_model, evaluate_model, test_model
 from src.predict import prevedi_fenomeno
 from src.create_graphs import create_graphs
 import os
+import signal
+import sys
+import shutil
 
 
 # Funzione per caricare la configurazione
@@ -23,10 +26,51 @@ def ask_to_skip(step_name):
             return response == 'si'
         print("Risposta non valida. Scrivi 'si' o 'no'.")
 
+def save_progress(model, scaler, optimizer, epoch, batch_idx, config):
+    checkpoint = {
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'scaler': scaler,
+        'epoch': epoch,
+        'batch_idx': batch_idx
+    }
+    torch.save(checkpoint, './models/checkpoint.pth')
+    shutil.copyfile(config['scaler_path'], './models/copy_scaler.pkl')
+    print("Progressi salvati.")
+
+def signal_handler(sig, frame):
+    save_progress(model, scaler, optimizer, epoch, batch_idx, config)
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
 
 def main():
+    global model, scaler, optimizer, epoch, batch_idx, config
+
     # Carica la configurazione
     config = load_config()
+
+    # Chiedi se ripristinare i progressi
+    if os.path.exists('./models/checkpoint.pth'):
+        if ask_to_skip("ripristinare i progressi salvati"):
+            checkpoint = torch.load('./models/checkpoint.pth')
+            model = MeteoModel(config)
+            model.load_state_dict(checkpoint['model_state_dict'])
+            optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
+            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            scaler = checkpoint['scaler']
+            epoch = checkpoint['epoch']
+            batch_idx = checkpoint['batch_idx']
+            shutil.copyfile('./models/copy_scaler.pkl', config['scaler_path'])
+        else:
+            os.remove('./models/checkpoint.pth')
+            os.remove('./models/copy_scaler.pkl')
+            epoch = 0
+            batch_idx = 0
+    else:
+        epoch = 0
+        batch_idx = 0
 
     # Carica e processa i dati
     train_data, eval_data, test_data, scaler = load_and_process_data(config['csv_path'], config)
@@ -50,7 +94,11 @@ def main():
 
     if ask_to_skip('addestramento'):
         print("Inizio dell'addestramento...")
-        train_model(model, train_dataloader, optimizer, criterion, config['num_epochs'], config)
+        for epoch in range(epoch, config['num_epochs']):
+            for batch_idx, (inputs, targets) in enumerate(train_dataloader, start=batch_idx):
+                train_model(model, train_dataloader, optimizer, criterion, config['num_epochs'], config)
+                pass
+            batch_idx = 0  # Reset batch_idx at the end of each epoch
 
     if ask_to_skip('valutazione'):
         print("Valutazione del modello...")

@@ -3,16 +3,16 @@ from torch.utils.tensorboard import SummaryWriter
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
-def train_model(model, train_dataloader, optimizer, criterion, num_epochs, config, start_epoch=0, start_batch_idx=0):
+def train_model(model, train_dataloader, optimizer, criterion, num_epochs, config):
     writer = SummaryWriter(config['log_dir'])
     model.train()
     all_labels = []
     all_predictions = []
-    for epoch in range(start_epoch, num_epochs):
+    for epoch in range(num_epochs):
         epoch_loss = 0
         correct_predictions = 0
         total_predictions = 0
-        for batch_idx, (inputs, labels) in enumerate(train_dataloader, start=start_batch_idx):
+        for inputs, labels in train_dataloader:
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, labels)
@@ -34,8 +34,6 @@ def train_model(model, train_dataloader, optimizer, criterion, num_epochs, confi
         writer.add_scalar('Loss/train', avg_loss, epoch)
         writer.add_scalar('Accuracy/train', accuracy, epoch)
         print(f'Epoch {epoch+1}/{num_epochs}, Loss: {avg_loss}, Accuracy: {accuracy}%')
-
-        start_batch_idx = 0  # Reset batch_idx at the end of each epoch
 
     # Confusion Matrix
     cm = confusion_matrix(all_labels, all_predictions)
